@@ -1,2 +1,2 @@
-# LearnQA_PythonAPI
+# LearnQA_Python_API
 Домашние задания, выполненные в рамках прохождения курса "Автоматизация тестирования REST API на Python"
