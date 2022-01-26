@@ -1,16 +1,16 @@
-import requests
+from lib.my_requests import MyRequests
 import pytest
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
 
-url = "https://playground.learnqa.ru/api/user/"
+urn = "/user"
 
 
 class TestUserRegister(BaseCase):
     def test_create_user_successfully(self):
         data = self.prepare_registration_data()
 
-        response = requests.post(url, data=data)
+        response = MyRequests.post(urn, data=data)
 
         Assertions.assert_status_code(response, 200)
         Assertions.assert_json_has_key(response, "id")
@@ -19,7 +19,7 @@ class TestUserRegister(BaseCase):
         email = "vinkotov@example.com"
         data = self.prepare_registration_data(email)
 
-        response = requests.post(url, data=data)
+        response = MyRequests.post(urn, data=data)
 
         Assertions.assert_status_code(response, 400)
         Assertions.assert_response_text(response, f"Users with email '{email}' already exists")
@@ -28,7 +28,7 @@ class TestUserRegister(BaseCase):
         email = "vinkotovexample.com"
         data = self.prepare_registration_data(email)
 
-        response = requests.post(url, data=data)
+        response = MyRequests.post(urn, data=data)
         Assertions.assert_status_code(response, 400)
         Assertions.assert_response_text(response, "Invalid email format")
 
@@ -46,7 +46,7 @@ class TestUserRegister(BaseCase):
 
     @pytest.mark.parametrize("data", data_empty_field)
     def test_create_user_with_empty_field(self, data):
-        response = requests.post(url, data=data)
+        response = MyRequests.post(urn, data=data)
         Assertions.assert_status_code(response, 400)
         Assertions.assert_response_text(response, f"The value of '{list(data.keys())[list(data.values()).index('')]}' "
                                                   f"field is too short")
@@ -59,7 +59,8 @@ class TestUserRegister(BaseCase):
             "lastName": "learnqa",
             "email": "vinkotov@example.com"
         }
-        response = requests.post(url, data=data)
+
+        response = MyRequests.post(urn, data=data)
         Assertions.assert_status_code(response, 400)
         Assertions.assert_response_text(response, "The value of 'firstName' field is too short")
 
@@ -71,6 +72,7 @@ class TestUserRegister(BaseCase):
             "lastName": "learnqa",
             "email": "vinkotov@example.com"
         }
-        response = requests.post(url, data=data)
+
+        response = MyRequests.post(urn, data=data)
         Assertions.assert_status_code(response, 400)
         Assertions.assert_response_text(response, "The value of 'firstName' field is too long")
