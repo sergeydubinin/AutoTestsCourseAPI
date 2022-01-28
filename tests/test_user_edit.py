@@ -1,9 +1,13 @@
 from lib.my_requests import MyRequests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
+import allure
 
 
+@allure.epic("Изменение данных пользователя")
 class TestUserEdit(BaseCase):
+    @allure.title("Изменение имени только что созданного пользовтаеля")
+    @allure.description("Данный тест проверяет успешность изменения имени только что зарегистрированного пользователя")
     def test_edit_just_created_user(self):
         # REGISTER
         register_data = self.prepare_registration_data()
@@ -39,6 +43,8 @@ class TestUserEdit(BaseCase):
 
         Assertions.assert_json_value_by_name(response4, "firstName", new_name, "Wrong name of the user after edit")
 
+    @allure.title("Изменение имени пользователя будучи неавторизованным")
+    @allure.description("Данный тест проверяет невозможность изменения имени пользователя будучи неавторизованным")
     def test_edit_user_without_auth(self):
         # REGISTER
         register_data = self.prepare_registration_data()
@@ -56,15 +62,17 @@ class TestUserEdit(BaseCase):
         Assertions.assert_status_code(response2, 400)
         Assertions.assert_response_text(response2, "Auth token not supplied")
 
+    @allure.title("Изменение имени другого пользователя")
+    @allure.description("Данный тест проверяет невозможность изменения имени пользователя с другим ID")
     def test_edit_being_authorized_as_other_user(self):
         # REGISTER
         register_data = self.prepare_registration_data()
         response1 = MyRequests.post("/user", data=register_data)
 
-        user_id = self.get_json_value(response1, 'id')
-
         Assertions.assert_status_code(response1, 200)
         Assertions.assert_json_has_key(response1, "id")
+
+        user_id = self.get_json_value(response1, 'id')
 
         # LOGIN AS OTHER USER
         data = {
@@ -84,6 +92,8 @@ class TestUserEdit(BaseCase):
         Assertions.assert_status_code(response3, 400)
         Assertions.assert_response_text(response3, "Please, do not edit test users with ID 1, 2, 3, 4 or 5.")
 
+    @allure.title("Изменение email пользователя на некорректный")
+    @allure.description("Данный тест проверяет невозможность изменения email пользователя на некорректный")
     def test_edit_to_invalid_email(self):
         # REGISTER
         register_data = self.prepare_registration_data()
@@ -115,6 +125,8 @@ class TestUserEdit(BaseCase):
         Assertions.assert_status_code(response3, 400)
         Assertions.assert_response_text(response3, "Invalid email format")
 
+    @allure.title("Изменение имени пользователя на некорректное")
+    @allure.description("Данный тест проверяет невозможность изменения имени пользователя на некорректное")
     def test_edit_to_invalid_first_name(self):
         # REGISTER
         register_data = self.prepare_registration_data()

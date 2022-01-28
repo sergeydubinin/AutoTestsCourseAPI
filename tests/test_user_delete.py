@@ -1,9 +1,13 @@
 from lib.my_requests import MyRequests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
+import allure
 
 
+@allure.epic("Удаление пользователя")
 class TestUserDelete(BaseCase):
+    @allure.title("Удаление пользователя с ID = 2")
+    @allure.description("Данный тест проверяет невозможность удаления пользователя с ID = 2")
     def test_delete_hardcoded_user_id_2(self):
         # LOGIN
         data = {
@@ -21,6 +25,8 @@ class TestUserDelete(BaseCase):
         Assertions.assert_status_code(response2, 400)
         Assertions.assert_response_text(response2, "Please, do not delete test users with ID 1, 2, 3, 4 or 5.")
 
+    @allure.title("Удаление только что созданного пользователя")
+    @allure.description("Данный тест проверяет успешность удаления только что созданного пользователя")
     def test_delete_just_created_user(self):
         # REGISTER
         register_data = self.prepare_registration_data()
@@ -56,15 +62,17 @@ class TestUserDelete(BaseCase):
         Assertions.assert_status_code(response4, 404)
         Assertions.assert_response_text(response4, "User not found")
 
+    @allure.title("Удаление другого пользователя")
+    @allure.description("Данный тест проверяет невозможность удаления пользователя с другим ID")
     def test_delete_being_authorized_as_other_user(self):
         # REGISTER
         register_data = self.prepare_registration_data()
         response1 = MyRequests.post("/user", data=register_data)
 
-        user_id = self.get_json_value(response1, 'id')
-
         Assertions.assert_status_code(response1, 200)
         Assertions.assert_json_has_key(response1, "id")
+
+        user_id = self.get_json_value(response1, 'id')
 
         # LOGIN AS OTHER USER
         data = {

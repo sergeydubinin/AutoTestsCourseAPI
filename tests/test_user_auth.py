@@ -2,8 +2,10 @@ import pytest
 from lib.my_requests import MyRequests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
+import allure
 
 
+@allure.epic("Авторизация пользователя")
 class TestUserAuth(BaseCase):
     exclude_params = [
         ("no_cookie",),
@@ -22,6 +24,8 @@ class TestUserAuth(BaseCase):
         self.token = self.get_header(response, "x-csrf-token")
         self.user_id_from_auth_method = self.get_json_value(response, "user_id")
 
+    @allure.title("Авторизация пользователя с корректными данными")
+    @allure.description("Данный тест успешно авторизует пользователя по email и паролю")
     def test_auth_user(self):
         response = MyRequests.get("/user/auth", headers={"x-csrf-token": self.token},
                                   cookies={"auth_sid": self.auth_sid})
@@ -29,6 +33,8 @@ class TestUserAuth(BaseCase):
         Assertions.assert_json_value_by_name(response, "user_id", self.user_id_from_auth_method,
                                              "User id from auth method is not equal to user id from check method")
 
+    @allure.title("Авторизация пользователя без передачи авторизационной куки или токена")
+    @allure.description("Данный тест проверяет статус авторизации без передачи авторизационной куки или токена")
     @pytest.mark.parametrize("condition", exclude_params)
     def test_negative_auth_check(self, condition):
         if condition == "no_cookie":
